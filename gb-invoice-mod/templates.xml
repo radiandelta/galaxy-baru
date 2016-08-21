@@ -1,0 +1,125 @@
+<openerp>
+    <data>
+		<template id="galaxy_external_layout_header" inherit_id="report.external_layout_header">
+			<xpath expr="//div[@class='header']" position="replace">
+				<div class="header">
+					<div class="row">
+						<div class="col-xs-3">
+							<img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 120px;"/>
+						</div>
+						<div class="col-xs-9 text-right" style="margin-top:20px;" 
+							t-field="company.partner_id" 
+							t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'/>
+					</div>
+					<div class="row zero_min_height">
+						<div class="col-xs-12">
+							<div style="border-bottom: 1px solid black;"></div>
+						</div>
+					</div>
+				</div>
+			</xpath>
+		</template>
+		<template id="galaxy_invoice_inherit" inherit_id="account.report_invoice_document">
+			<xpath expr="//div[@class='page']" position="replace">
+				<div class="page">
+					<table class="col-xs-12">
+						<tr>
+							<div class="col-xs-12 text-middle" style="background-color:#a9a9a9;border:1px solid #a9a9a9;color:#000000;">
+								<h3>
+									<span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Invoice</span>
+									<span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">PRO-FORMA</span>
+									<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
+									<span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
+									<span t-if="o.type == 'out_refund'">Refund</span>
+									<span t-if="o.type == 'in_refund'">Supplier Refund</span>
+									<span t-if="o.type == 'in_invoice'">Supplier Invoice</span>
+								</h3>
+							</div>
+						</tr>
+						<tr>
+							<div class="col-xs-6" style="border-left:1px solid #000000;border-bottom:1px solid #000000;height:100px">
+								<strong>
+								<span t-field="o.partner_id.name" style="font-size:18px" /><br/>
+								<span t-field="o.partner_id.street" style="font-size:15px" /><br/>
+								<spab t-field="o.partner_id.city" style="font-size:15px" /><br/></strong>
+							</div>
+							<div class="col-xs-3" style="text-align:right;border-left:1px solid #000000;border-bottom:1px solid #000000;height:100px">
+								<strong>No. Invoice:</strong><br/>
+								<strong>Tgl Invoice:</strong><br/>
+								<strong>Jth Tempo:</strong><br/>
+								<strong>No.PO:</strong>
+
+							</div>
+							<div class="col-xs-3" style="border-right:1px solid #000000;border-bottom:1px solid #000000;height:100px">
+								<span t-field="o.number"/><br/><!-- example of how to access field values -->
+								<span t-field="o.date_invoice"/><br/>
+								<span t-field="o.date_due"/><br/>
+								<span t-field="o.origin"/>
+							</div>
+						</tr>
+					</table>
+					<table class="col-xs-12">
+						<thead>
+							<tr style="background-color:#a9a9a9;border: 1px solid;">
+								<th class="col-xs-1 text-middle">NO.</th>
+								<th class="col-xs-8" style="font-size:15px">NAMA PRODUK</th>
+								<th class="col-xs-1 text-middle">QTY</th>
+								<th class="col-xs-1 text-middle">HARGA</th>
+								<th class="col-xs-1 text-middle">JUMLAH</th>
+							</tr>
+						</thead>
+						<tbody class="invoice_tbody">
+							<tr t-foreach="o.invoice_line" t-as="l">
+								<td class="col-xs-1 text-right" style="border-left:1px solid #000000;"><span t-esc="l_index+1"/></td>
+								<td class="col-xs-8" style="border-left:1px solid #000000;"><span t-field="l.name" style="font-size:15px" /></td>
+								<td class="col-xs-1" style="border-left:1px solid #000000;"><span t-field="l.quantity"/></td>
+								<td class="col-xs-1 text-right" style="border-left:1px solid #000000;">
+									<span t-esc="'{:,.0f}'.format(int(l.price_unit))"/>
+								</td>
+								<td class="col-xs-1 text-right" style="border-left:1px solid #000000;border-right:1px solid #000000;">
+									<span t-field="l.price_subtotal"/>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table class="table table-condensed">
+						<tr style="font-size:18px">
+							<td class="col-xs-11" 
+							    style="text-align:right;border-left: 1px solid #000000;border-bottom: 1px solid #000000;border-top: 1px solid #000000;">
+								<strong>Total:</strong>
+							</td>
+							<td class="col-xs-1" 
+							    style="text-align:right;border-right: 1px solid #000000;border-bottom: 1px solid #000000;border-top: 1px solid #000000;">
+								<strong><span t-field="o.amount_untaxed"/>
+								</strong>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-12">
+								<strong>
+									<span>Catatan :<br/></span>
+									<span>Barang yang sudah dibeli tidak dapat ditukar atau dikembalikan lagi</span>
+								</strong>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</xpath>
+		</template>
+		<record id="gb_invoice" model="report.paperformat">
+			<field name="name">Invoice GB</field>
+			<field name="default" eval="True"/>
+			<field name="format">A5</field>
+			<field name="page_height">0</field>
+			<field name="page_width">0</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">30</field>
+			<field name="margin_bottom">20</field>
+			<field name="margin_left">7</field>
+			<field name="margin_right">7</field>
+			<field name="header_line" eval="False"/>
+			<field name="header_spacing">28</field>
+			<field name="dpi">90</field>
+		</record>
+	</data>
+</openerp>
